@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expert Call"
+  short_description: "Find task experts from a remote or local registry"
+  default_prompt: "Use $expert-call to find the best expert for this task."
