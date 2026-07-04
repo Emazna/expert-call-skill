@@ -1,6 +1,6 @@
 ---
 name: expert-call
-description: Search the Expert Call registry, local or remote, for task-specific experts/skills and decide whether to apply one. Use when a task may benefit from specialized workflows, domain experts, file-format specialists, research/database skills, creative production skills, legal/finance/accounting helpers, sales/marketing helpers, or any situation where Codex should discover and optionally clone a relevant expert before proceeding. Supports the remote Expert Call API at https://expert-call.api.external.emazna.com with API-key authentication.
+description: Search the remote Expert Call registry for task-specific experts/skills and decide whether to apply one. Use when a task may benefit from specialized workflows, domain experts, file-format specialists, research/database skills, creative production skills, legal/finance/accounting helpers, sales/marketing helpers, or any situation where Codex should discover and optionally clone a relevant expert before proceeding. Uses https://expert-call.api.external.emazna.com with API-key authentication.
 ---
 
 # Expert Call
@@ -11,9 +11,9 @@ Expert Call lets an agent ask a registry which specialist should help with the c
 
 Default remote API: `https://expert-call.api.external.emazna.com`
 
-Local fallback API: `http://127.0.0.1:8765`
+Use the remote API by default. The remote API requires `EXPERT_CALL_API_KEY` for every endpoint except `GET /health`. If `EXPERT_CALL_API_URL` or `EXPERT_CALL_URL` is set, use that endpoint.
 
-Use the remote API when available. The remote API requires `EXPERT_CALL_API_KEY` for every endpoint except `GET /health`. If `EXPERT_CALL_API_URL` or `EXPERT_CALL_URL` is set, use that endpoint. If no endpoint is configured and a local server is healthy, local may be used as a fallback.
+Do not silently fall back to a local registry. Most users will not have a local Expert Call API running, and a local fallback can make a failed remote search look successful. Use a local registry only when the user or environment explicitly sets `EXPERT_CALL_API_URL`, `EXPERT_CALL_URL`, or `--server` to that local URL.
 
 Search can combine BM25 keyword ranking, Capability Graph, Query Understanding, and lightweight embeddings. Hosted deployments may disable embeddings for latency; the registry still returns TopK candidates for the calling LLM to inspect and choose what, if anything, to apply.
 
@@ -25,7 +25,7 @@ Set these environment variables when using the hosted registry:
 - `EXPERT_CALL_API_KEY=<provided key>`
 - `EXPERT_CALL_TIMEOUT_MS=30000` may be adjusted when a slow registry needs more time.
 
-If the API key is missing and the remote API returns `401`, ask the user to provide/configure the key or run a local Expert Call server. Do not silently pretend a search was performed.
+If the API key is missing and the remote API returns `401`, ask the user to provide/configure the key. Do not silently pretend a search was performed.
 
 ## Workflow
 

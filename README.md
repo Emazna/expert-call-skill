@@ -12,7 +12,7 @@ Copy this repository into your agent's local skills directory, or ask the agent 
 https://github.com/Emazna/expert-call-skill
 ```
 
-Configure the hosted registry:
+Configure the hosted registry key. The hosted URL is the default, but setting it explicitly is fine:
 
 ```powershell
 $env:EXPERT_CALL_API_URL="https://expert-call.api.external.emazna.com"
@@ -32,5 +32,5 @@ node scripts\query-registry.mjs search "明日の研究の着手発表で使う�
 
 - This repository intentionally does not contain the Expert Call backend, database schema, crawler, deployment config, internal registry data, or API secrets.
 - Hosted search requires an API key for endpoints other than `/health`.
+- There is no implicit local fallback. A local registry is used only when explicitly configured with `EXPERT_CALL_API_URL` or `--server`.
 - External skill bodies are imported on demand according to the registry import plan.
-

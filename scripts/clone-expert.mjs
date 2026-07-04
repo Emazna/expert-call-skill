@@ -12,7 +12,7 @@ const expertsDir = path.join(skillRoot, "experts");
 const defaultServerUrl =
   process.env.EXPERT_CALL_API_URL ||
   process.env.EXPERT_CALL_URL ||
-  (process.env.EXPERT_CALL_API_KEY ? "https://expert-call.api.external.emazna.com" : "http://127.0.0.1:8765");
+  "https://expert-call.api.external.emazna.com";
 const defaultTimeoutMs = Number(process.env.EXPERT_CALL_TIMEOUT_MS || 30000);
 
 function usage() {
@@ -25,7 +25,8 @@ function usage() {
     "Environment:",
     "  EXPERT_CALL_API_URL or EXPERT_CALL_URL selects the registry endpoint.",
     "  EXPERT_CALL_API_KEY is sent as Authorization: Bearer <key>.",
-    "  EXPERT_CALL_TIMEOUT_MS sets the import-plan request timeout in milliseconds. Default: 30000."
+    "  EXPERT_CALL_TIMEOUT_MS sets the import-plan request timeout in milliseconds. Default: 30000.",
+    "  Local registries are used only when explicitly selected with --server or EXPERT_CALL_API_URL."
   ].join("\n");
 }
 
@@ -97,7 +98,7 @@ async function fetchJson(url, apiKey, timeoutMs) {
   if (!response.ok) {
     const hint =
       response.status === 401
-        ? "Remote Expert Call API requires EXPERT_CALL_API_KEY. Configure it or use a local server."
+        ? "Remote Expert Call API requires EXPERT_CALL_API_KEY. Configure it before retrying."
         : "";
     throw new Error(`GET ${url} failed with ${response.status}${hint ? `. ${hint}` : ""}`);
   }

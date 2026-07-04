@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const remoteDefault = "https://expert-call.api.external.emazna.com";
-const localDefault = "http://127.0.0.1:8765";
 const defaultTimeoutMs = Number(process.env.EXPERT_CALL_TIMEOUT_MS || 30000);
 
 function usage() {
@@ -16,7 +15,8 @@ function usage() {
     "  EXPERT_CALL_API_URL or EXPERT_CALL_URL selects the registry endpoint.",
     "  EXPERT_CALL_API_KEY is sent as Authorization: Bearer <key>.",
     "  EXPERT_CALL_TIMEOUT_MS sets the per-request timeout in milliseconds. Default: 30000.",
-    "  If no endpoint is set, an API key implies the remote default; otherwise local health is tried before remote."
+    "  If no endpoint is set, the hosted Expert Call API is used.",
+    "  Local registries are used only when explicitly selected with --server or EXPERT_CALL_API_URL."
   ].join("\n");
 }
 
@@ -90,7 +90,7 @@ async function requestJson(url, apiKey, options = {}) {
   if (!response.ok) {
     const hint =
       response.status === 401
-        ? "Remote Expert Call API requires EXPERT_CALL_API_KEY. Configure it or use a local server."
+        ? "Remote Expert Call API requires EXPERT_CALL_API_KEY. Configure it before retrying."
         : undefined;
     const error = new Error(`GET ${url} failed with ${response.status}`);
     error.statusCode = response.status;
@@ -101,22 +101,9 @@ async function requestJson(url, apiKey, options = {}) {
   return payload;
 }
 
-async function isHealthy(url) {
-  try {
-    await requestJson(`${url.replace(/\/+$/, "")}/health`, "", {
-      timeoutMs: 1000
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 async function resolveServerUrl(args) {
   const explicit = args.serverUrl || process.env.EXPERT_CALL_API_URL || process.env.EXPERT_CALL_URL;
   if (explicit) return explicit.replace(/\/+$/, "");
-  if (args.apiKey) return remoteDefault;
-  if (await isHealthy(localDefault)) return localDefault;
   return remoteDefault;
 }
 
