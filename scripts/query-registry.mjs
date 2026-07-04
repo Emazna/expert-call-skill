@@ -13,7 +13,7 @@ function usage() {
     "",
     "Environment:",
     "  EXPERT_CALL_API_URL or EXPERT_CALL_URL selects the registry endpoint.",
-    "  EXPERT_CALL_API_KEY is sent as Authorization: Bearer <key>.",
+    "  EXPERT_CALL_API_KEY is optional and sent as Authorization: Bearer <key> when set.",
     "  EXPERT_CALL_TIMEOUT_MS sets the per-request timeout in milliseconds. Default: 30000.",
     "  If no endpoint is set, the hosted Expert Call API is used.",
     "  Local registries are used only when explicitly selected with --server or EXPERT_CALL_API_URL."
@@ -90,7 +90,7 @@ async function requestJson(url, apiKey, options = {}) {
   if (!response.ok) {
     const hint =
       response.status === 401
-        ? "Remote Expert Call API requires EXPERT_CALL_API_KEY. Configure it before retrying."
+        ? "This Expert Call endpoint requires EXPERT_CALL_API_KEY. Configure it before retrying."
         : undefined;
     const error = new Error(`GET ${url} failed with ${response.status}`);
     error.statusCode = response.status;

@@ -1,6 +1,6 @@
 ---
 name: expert-call
-description: Search the remote Expert Call registry for task-specific experts/skills and decide whether to apply one. Use when a task may benefit from specialized workflows, domain experts, file-format specialists, research/database skills, creative production skills, legal/finance/accounting helpers, sales/marketing helpers, or any situation where Codex should discover and optionally clone a relevant expert before proceeding. Uses https://expert-call.api.external.emazna.com with API-key authentication.
+description: Search the remote Expert Call registry for task-specific experts/skills and decide whether to apply one. Use when a task may benefit from specialized workflows, domain experts, file-format specialists, research/database skills, creative production skills, legal/finance/accounting helpers, sales/marketing helpers, or any situation where Codex should discover and optionally clone a relevant expert before proceeding. Uses https://expert-call.api.external.emazna.com.
 ---
 
 # Expert Call
@@ -11,7 +11,7 @@ Expert Call lets an agent ask a registry which specialist should help with the c
 
 Default remote API: `https://expert-call.api.external.emazna.com`
 
-Use the remote API by default. The remote API requires `EXPERT_CALL_API_KEY` for every endpoint except `GET /health`. If `EXPERT_CALL_API_URL` or `EXPERT_CALL_URL` is set, use that endpoint.
+Use the remote API by default. Hosted search currently does not require an API key. If `EXPERT_CALL_API_URL` or `EXPERT_CALL_URL` is set, use that endpoint. If a future/private endpoint requires authentication, send `EXPERT_CALL_API_KEY` as a bearer token.
 
 Do not silently fall back to a local registry. Most users will not have a local Expert Call API running, and a local fallback can make a failed remote search look successful. Use a local registry only when the user or environment explicitly sets `EXPERT_CALL_API_URL`, `EXPERT_CALL_URL`, or `--server` to that local URL.
 
@@ -22,10 +22,10 @@ Search can combine BM25 keyword ranking, Capability Graph, Query Understanding, 
 Set these environment variables when using the hosted registry:
 
 - `EXPERT_CALL_API_URL=https://expert-call.api.external.emazna.com`
-- `EXPERT_CALL_API_KEY=<provided key>`
+- `EXPERT_CALL_API_KEY=<provided key>` is optional and only needed when the selected endpoint requires authentication.
 - `EXPERT_CALL_TIMEOUT_MS=30000` may be adjusted when a slow registry needs more time.
 
-If the API key is missing and the remote API returns `401`, ask the user to provide/configure the key. Do not silently pretend a search was performed.
+If the remote API returns `401`, ask the user to provide/configure an API key for that endpoint. Do not silently pretend a search was performed.
 
 ## Workflow
 
@@ -37,11 +37,11 @@ If the API key is missing and the remote API returns `401`, ask the user to prov
 6. For local or metadata-only candidates, apply the best candidate when it clearly fits.
 7. When a broad local expert and a concrete external GitHub skill both match, use the local expert as routing context and the external skill for detailed procedure if it would improve the task.
 8. For an external GitHub candidate whose detailed procedure, references, scripts, or assets would improve the task, run `node scripts/query-registry.mjs import-plan <expert-id>`.
-9. If `importPlan.canUseAsTemporaryContext` and `importPlan.localClone.canLocalClone` are true, run `node scripts/clone-expert.mjs <expert-id>` from this skill directory. The script uses the same `EXPERT_CALL_API_URL`/`EXPERT_CALL_API_KEY` environment variables. Read the cloned `SKILL.md` and only the task-relevant files it directly references. Treat the clone under `experts/` as a private local cache, not central registry content.
+9. If `importPlan.canUseAsTemporaryContext` and `importPlan.localClone.canLocalClone` are true, run `node scripts/clone-expert.mjs <expert-id>` from this skill directory. The script uses the same `EXPERT_CALL_API_URL` and optional `EXPERT_CALL_API_KEY` environment variables. Read the cloned `SKILL.md` and only the task-relevant files it directly references. Treat the clone under `experts/` as a private local cache, not central registry content.
 10. After selecting and loading an external skill, operationalize it: turn the task-relevant instructions into a compact execution checklist or plan, then use that checklist while doing the task. Do not merely mention that the skill exists. Skip items only when they are irrelevant, unsafe, unavailable in the current environment, or outside the user's requested scope.
 11. Do not add hard-coded instructions for specific external skills into this Expert Call skill. Specific review checklists, file-format workflows, tool commands, or domain practices belong in the selected external skill and its referenced files.
 12. Ask the user before using source-available/unknown/proprietary skill bodies, running cloned scripts, accessing secrets, making external writes, touching production systems, or installing a cloned expert as a persistent skill. Reading an index-approved MIT/Apache-style skill as temporary context does not need separate user approval.
-13. After use, optionally record an event with `POST /events` including `expertId`, `type`, `outcome`, and a short task note. Use API-key auth when writing to the remote API.
+13. After use, optionally record an event with `POST /events` including `expertId`, `type`, `outcome`, and a short task note.
 
 ## Query Examples
 
@@ -57,8 +57,7 @@ node scripts/clone-expert.mjs anthropic-webapp-testing
 Direct curl:
 
 ```bash
-curl -H "Authorization: Bearer $EXPERT_CALL_API_KEY" \
-  "https://expert-call.api.external.emazna.com/search?q=contract%20review&limit=3"
+curl "https://expert-call.api.external.emazna.com/search?q=contract%20review&limit=3"
 ```
 
 Structured search:
