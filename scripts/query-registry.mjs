@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const remoteDefault = "https://expert-call.api.external.emazna.com";
-const defaultTimeoutMs = Number(process.env.EXPERT_CALL_TIMEOUT_MS || 30000);
+const defaultTimeoutMs = Number(process.env.EXPERT_CALL_TIMEOUT_MS || 90000);
 
 function usage() {
   return [
@@ -14,7 +14,7 @@ function usage() {
     "Environment:",
     "  EXPERT_CALL_API_URL or EXPERT_CALL_URL selects the registry endpoint.",
     "  EXPERT_CALL_API_KEY is optional and sent as Authorization: Bearer <key> when set.",
-    "  EXPERT_CALL_TIMEOUT_MS sets the per-request timeout in milliseconds. Default: 30000.",
+    "  EXPERT_CALL_TIMEOUT_MS sets the per-request timeout in milliseconds. Default: 90000.",
     "  If no endpoint is set, the hosted Expert Call API is used.",
     "  Local registries are used only when explicitly selected with --server or EXPERT_CALL_API_URL."
   ].join("\n");
@@ -66,7 +66,7 @@ function parseArgs(argv) {
     fail(`Missing value for ${parsed.command}.\n\n${usage()}`);
   }
   if (!Number.isFinite(parsed.limit) || parsed.limit <= 0) parsed.limit = 8;
-  if (!Number.isFinite(parsed.timeoutMs) || parsed.timeoutMs <= 0) parsed.timeoutMs = 30000;
+  if (!Number.isFinite(parsed.timeoutMs) || parsed.timeoutMs <= 0) parsed.timeoutMs = 90000;
   return parsed;
 }
 

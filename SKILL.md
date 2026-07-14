@@ -23,7 +23,7 @@ Set these environment variables when using the hosted registry:
 
 - `EXPERT_CALL_API_URL=https://expert-call.api.external.emazna.com`
 - `EXPERT_CALL_API_KEY=<provided key>` is optional and only needed when the selected endpoint requires authentication.
-- `EXPERT_CALL_TIMEOUT_MS=30000` may be adjusted when a slow registry needs more time.
+- Search requests allow `90000` ms by default because Query Understanding may call a remote LLM before ranking. Set `EXPERT_CALL_TIMEOUT_MS` or `--timeout-ms` only when the surrounding agent has a different deadline.
 
 If the remote API returns `401`, ask the user to provide/configure an API key for that endpoint. Do not silently pretend a search was performed.
 
